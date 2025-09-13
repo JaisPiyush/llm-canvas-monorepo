@@ -1,5 +1,12 @@
 @import './base.css';
 
+@font-face {
+  font-family: 'Monaco';
+  font-style: normal;
+  font-weight: normal;
+  src: local('Monaco'), url('./fonts/Monaco.woff') format('woff');
+  }
+
 body {
   display: flex;
   align-items: center;
@@ -16,11 +23,11 @@ code {
   border-radius: 2px;
   background-color: var(--color-background-mute);
   font-family:
-    ui-monospace,
-    SFMono-Regular,
-    SF Mono,
+    Monaco,
     Menlo,
     Consolas,
+    SFMono-Regular,
+    SF Mono,
     Liberation Mono,
     monospace;
   font-size: 85%;
