@@ -6,10 +6,12 @@ import icon from '../../resources/icon.png?asset'
 import { ContributionManager } from './contributions/contributionManager'
 import { setupContributionIpcHandlers } from './ipc/contributionHandler'
 import fs from 'fs'
+import { MainProcessViewManager } from './contributions/views/viewManager'
 
 export class LLMCanvasApp {
   private mainWindow: BrowserWindow | null = null
   private contributionManager: ContributionManager | null = null
+  private viewManager: MainProcessViewManager | null = null
 
   constructor() {
     this.setupEventHandlers()
@@ -102,6 +104,10 @@ export class LLMCanvasApp {
     })
 
     await this.contributionManager.initialize(this.mainWindow)
+
+    this.viewManager = new MainProcessViewManager(this.contributionManager!, this.mainWindow!)
+
+    await this.viewManager.initialize()
   }
 
   private setupEventHandlers(): void {
@@ -165,6 +171,10 @@ export class LLMCanvasApp {
 
   getContributionManager(): ContributionManager | null {
     return this.contributionManager
+  }
+
+  getViewManager(): MainProcessViewManager | null {
+    return this.viewManager
   }
 }
 

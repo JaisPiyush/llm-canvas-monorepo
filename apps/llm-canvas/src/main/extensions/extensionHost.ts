@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { fork, ChildProcess } from 'child_process'
 import * as path from 'path'
-import SafeEventEmitter from '@metamask/safe-event-emitter'
+import EventEmitter from 'eventemitter3'
 import { ExtensionHostEvents, ExtensionManifest } from '@llm-canvas/sdk'
 
 export interface ExtensionHostOptions {
@@ -19,7 +19,7 @@ export interface ExtensionInfo {
   activationEvents: string[]
 }
 
-export class ExtensionHost extends SafeEventEmitter {
+export class ExtensionHost extends EventEmitter {
   private childProcess: ChildProcess | null = null
   private readonly options: Required<ExtensionHostOptions>
   private readonly extensions = new Map<string, ExtensionInfo>()

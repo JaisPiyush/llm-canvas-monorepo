@@ -283,9 +283,44 @@ export interface ExtensionManifest {
     }
   }
 
+export interface ViewSystemAPI {
+  // View management
+  showView: (viewId: string, containerId?: string) => Promise<any>,
+  hideView: (viewId: string) => Promise<any>,
+  toggleView: (viewId: string) => Promise<any>,
+  setActiveView: (viewId: string) => Promise<any>,
+  refreshView: (viewId: string) => Promise<any>,
+  revealView: (viewId: string, element?: any, options?: any) =>
+    Promise<any>,
+
+  // Layout management
+  getViewLayout: (containerId: string) => Promise<any>,
+  getViewsInContainer: (containerId: string) =>
+    Promise<any>,
+  getActiveView: () => Promise<any>,
+  getViewContext: (viewId: string) => Promise<any>,
+
+  // Tree view operations
+  treeView: {
+    getChildren: (viewId: string, element?: any) =>
+      Promise<any>,
+    getTreeItem: (viewId: string, element: any) =>
+      Promise<any>,
+    reveal: (viewId: string, element: any, options?: any) =>
+      Promise<any>
+  },
+
+  // Webview operations
+  webview: {
+    postMessage: (viewId: string, message: any) =>
+      Promise<any>,
+    setHtml: (viewId: string, html: string) => Promise<any>
+  }
+}
 
 export interface CanvasAPI {
   // Extension management
+  views: ViewSystemAPI,
   extensions: {
     list: () => Promise<any>,
     activate: (extensionId: string) => Promise<any>,
@@ -380,5 +415,171 @@ export enum ExtensionHostEvents {
   contributionsUnregistered = 'contributionsUnregistered',
   extensionActivated = 'extensionActivated',
   extensionDeactivated = 'extensionDeactivated',
-  extensionError = 'extensionError'
+  extensionError = 'extensionError',
 }
+
+export interface ViewRegistryOptions {
+  enableValidation?: boolean
+  maxViewsPerContainer?: number
+}
+
+export interface ViewInstance {
+  id: string
+  extensionId: string
+  viewId: string
+  containerId: string
+  type: ViewType
+  isVisible: boolean
+  isActive: boolean
+  title: string
+  description?: string
+  when?: string
+  provider?: ViewProvider
+  webview?: WebviewView
+  treeView?: TreeView
+  element?: HTMLElement
+  state: ViewState
+  disposables: Array<{ dispose(): void }>
+}
+
+export interface ViewState {
+  collapsed: boolean
+  size?: number
+  position?: number
+  customData?: Record<string, any>
+}
+
+export interface ViewProvider {
+  readonly viewType: string
+  readonly canResolveView?: boolean
+  resolveView?(view: ViewInstance): Promise<void> | void
+  refresh?(): Promise<void> | void
+  dispose?(): void
+}
+
+export interface WebviewView {
+  readonly webview: Webview
+  readonly viewType: string
+  readonly title?: string
+  readonly description?: string
+  show(preserveFocus?: boolean): void
+  dispose(): void
+}
+
+export interface TreeView<T = any> {
+  readonly dataProvider: TreeDataProvider<T>
+  readonly selection: readonly T[]
+  readonly visible: boolean
+  readonly onDidChangeSelection: DisposableEvent<TreeViewSelectionChangeEvent<T>>
+  readonly onDidChangeVisibility: DisposableEvent<TreeViewVisibilityChangeEvent>
+  reveal(element: T, options?: { select?: boolean; focus?: boolean; expand?: boolean | number }): Promise<void>
+  dispose(): void
+}
+
+export interface TreeDataProvider<T = any> {
+  readonly onDidChangeTreeData?: DisposableEvent<T | undefined | null | void>
+  getTreeItem(element: T): TreeItem | Promise<TreeItem>
+  getChildren(element?: T): T[] | Promise<T[]>
+  getParent?(element: T): T | Promise<T | undefined>
+  resolveTreeItem?(item: TreeItem, element: T): TreeItem | Promise<TreeItem>
+}
+
+export interface TreeItem {
+  readonly id?: string
+  readonly label?: string | TreeItemLabel
+  readonly description?: string | boolean
+  readonly tooltip?: string | MarkdownString
+  readonly command?: Command
+  readonly collapsibleState?: TreeItemCollapsibleState
+  readonly contextValue?: string
+  readonly iconPath?: string | Uri | { light: string | Uri; dark: string | Uri } | ThemeIcon
+  readonly resourceUri?: Uri
+  readonly accessibilityInformation?: AccessibilityInformation
+}
+
+export interface TreeItemLabel {
+  readonly label: string
+  readonly highlights?: [number, number][]
+}
+
+export enum TreeItemCollapsibleState {
+  None = 0,
+  Collapsed = 1,
+  Expanded = 2
+}
+
+export interface TreeViewSelectionChangeEvent<T> {
+  readonly selection: readonly T[]
+}
+
+export interface TreeViewVisibilityChangeEvent {
+  readonly visible: boolean
+}
+
+export interface Webview {
+  readonly options: WebviewOptions
+  html: string
+  readonly onDidReceiveMessage: DisposableEvent<any>
+  postMessage(message: any): Promise<boolean>
+  dispose(): void
+}
+
+export interface WebviewOptions {
+  readonly enableScripts?: boolean
+  readonly enableForms?: boolean
+  readonly enableCommandUris?: boolean | readonly string[]
+  readonly localResourceRoots?: readonly Uri[]
+  readonly portMapping?: readonly WebviewPortMapping[]
+}
+
+export interface WebviewPortMapping {
+  readonly webviewPort: number
+  readonly extensionHostPort: number
+}
+
+// Common interfaces
+export interface DisposableEvent<T> {
+  (listener: (e: T) => any, thisArg?: any): { dispose(): void }
+}
+
+export interface Command {
+  readonly command: string
+  readonly title: string
+  readonly arguments?: any[]
+  readonly tooltip?: string
+}
+
+export interface Uri {
+  readonly scheme: string
+  readonly authority: string
+  readonly path: string
+  readonly query: string
+  readonly fragment: string
+  readonly fsPath: string
+  toString(skipEncoding?: boolean): string
+  toJSON(): any
+}
+
+export interface MarkdownString {
+  readonly value: string
+  readonly isTrusted?: boolean
+  readonly supportThemeIcons?: boolean
+  appendText(value: string): MarkdownString
+  appendMarkdown(value: string): MarkdownString
+  appendCodeblock(value: string, language?: string): MarkdownString
+}
+
+export interface ThemeIcon {
+  readonly id: string
+  readonly color?: ThemeColor
+}
+
+export interface ThemeColor {
+  readonly id: string
+}
+
+export interface AccessibilityInformation {
+  readonly label: string
+  readonly role?: string
+}
+

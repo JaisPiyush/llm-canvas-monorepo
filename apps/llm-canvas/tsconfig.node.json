@@ -1,9 +1,9 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
-  "include": ["electron.vite.config.*", "src/main/**/*", "src/preload/**/*", "src/shared/**/*", "../../packages/llm-canvas-sdk/src/contribution/contributionLoader.ts"],
+  "include": ["electron.vite.config.*", "vitest.config.*", "src/main/**/*", "src/preload/**/*", "src/shared/**/*", "test/**/*", "../../packages/llm-canvas-sdk/src/contribution/contributionLoader.ts"],
   "compilerOptions": {
     "composite": true,
-    "types": ["electron-vite/node"],
+    "types": ["electron-vite/node", "vitest/globals"],
     "moduleResolution": "bundler",
     "baseUrl": ".",
     "paths": {

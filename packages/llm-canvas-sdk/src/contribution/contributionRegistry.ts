@@ -1,4 +1,5 @@
-import SafeEventEmitter  from '@metamask/safe-event-emitter';
+import EventEmitter from 'eventemitter3';
+
 import {
   ContributionPoints,
   ResolvedViewContainerContribution,
@@ -13,6 +14,7 @@ import {
   ViewContainerLocation,
   ExtensionHostEvents,
 } from '../types';
+import { contextEvaluator as defaultContextEvaluator, ContextEvaluator } from './contextEvaluator';
 
 export interface ContributionRegistryOptions {
   enableValidation?: boolean;
@@ -20,7 +22,7 @@ export interface ContributionRegistryOptions {
   maxContributionsPerExtension?: number;
 }
 
-export class ContributionRegistry extends SafeEventEmitter {
+export class ContributionRegistry extends EventEmitter {
   private readonly options: Required<ContributionRegistryOptions>;
   
   // Storage for contributions by type
@@ -34,12 +36,14 @@ export class ContributionRegistry extends SafeEventEmitter {
   // Extension tracking
   private readonly extensionContributions = new Map<string, Set<string>>();
   private readonly contributionExtensions = new Map<string, string>();
+
+  public readonly contextEvaluator: ContextEvaluator;
   
   // State tracking
   private readonly conflictRegistry = new Map<string, string[]>();
   private isDisposed = false;
 
-  constructor(options: ContributionRegistryOptions = {}) {
+  constructor(options: ContributionRegistryOptions = {}, _contextEvaluator?: ContextEvaluator) {
     super();
     this.options = {
       enableValidation: true,
@@ -47,6 +51,7 @@ export class ContributionRegistry extends SafeEventEmitter {
       maxContributionsPerExtension: 1000,
       ...options
     };
+    this.contextEvaluator = _contextEvaluator ?? defaultContextEvaluator
   }
 
   // Typed event overloads for stronger typing and to avoid mismatched emit signatures

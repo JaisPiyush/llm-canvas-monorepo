@@ -2,7 +2,6 @@ export { ContributionRegistry, contributionRegistry, ContributionRegistryOptions
 export { ContributionLoader } from './contributionLoader';
 export { ContextEvaluator, contextEvaluator } from './contextEvaluator';
 export { ContributionValidator, contributionValidator} from './contributionValidator'
-export * from '../types';
 
 import {ContributionRegistry, ContributionRegistryOptions} from "./contributionRegistry"
 import {ContributionLoader, ContributionLoaderOptions} from "./contributionLoader"

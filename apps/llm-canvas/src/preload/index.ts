@@ -5,8 +5,45 @@ import { contextBridge, ipcRenderer } from 'electron'
 import packageJson from '../../package.json'
 import { CanvasAPI, ExtensionHostEvents } from '@llm-canvas/sdk'
 
+const viewSystemAPI: CanvasAPI['views'] = {
+  // View management
+  showView: (viewId: string, containerId?: string) =>
+    ipcRenderer.invoke('views:show', viewId, containerId),
+  hideView: (viewId: string) => ipcRenderer.invoke('views:hide', viewId),
+  toggleView: (viewId: string) => ipcRenderer.invoke('views:toggle', viewId),
+  setActiveView: (viewId: string) => ipcRenderer.invoke('views:setActive', viewId),
+  refreshView: (viewId: string) => ipcRenderer.invoke('views:refresh', viewId),
+  revealView: (viewId: string, element?: any, options?: any) =>
+    ipcRenderer.invoke('views:reveal', viewId, element, options),
+
+  // Layout management
+  getViewLayout: (containerId: string) => ipcRenderer.invoke('views:getLayout', containerId),
+  getViewsInContainer: (containerId: string) =>
+    ipcRenderer.invoke('views:getViewsInContainer', containerId),
+  getActiveView: () => ipcRenderer.invoke('views:getActiveView'),
+  getViewContext: (viewId: string) => ipcRenderer.invoke('views:getViewContext', viewId),
+
+  // Tree view operations
+  treeView: {
+    getChildren: (viewId: string, element?: any) =>
+      ipcRenderer.invoke('treeView:getChildren', viewId, element),
+    getTreeItem: (viewId: string, element: any) =>
+      ipcRenderer.invoke('treeView:getTreeItem', viewId, element),
+    reveal: (viewId: string, element: any, options?: any) =>
+      ipcRenderer.invoke('treeView:reveal', viewId, element, options)
+  },
+
+  // Webview operations
+  webview: {
+    postMessage: (viewId: string, message: any) =>
+      ipcRenderer.invoke('webview:postMessage', viewId, message),
+    setHtml: (viewId: string, html: string) => ipcRenderer.invoke('webview:setHtml', viewId, html)
+  }
+}
+
 // Implementation of the API
 const canvasAPI: CanvasAPI = {
+  views: viewSystemAPI,
   // Extension management
   extensions: {
     list: () => ipcRenderer.invoke('extensions:list'),
@@ -143,6 +180,8 @@ const canvasAPI: CanvasAPI = {
     version: process.version
   }
 }
+
+
 
 // Expose the API to the renderer process
 // contextBridge.exposeInMainWorld('electronAPI', electronAPI)

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import SafeEventEmitter from '@metamask/safe-event-emitter'
+import EventEmitter from 'eventemitter3'
 import { ContributionRegistry, ContributionLoader, ExtensionHostEvents } from '@llm-canvas/sdk'
 import { ExtensionHost, ExtensionInfo } from '../extensions/extensionHost'
 import { BrowserWindow } from 'electron'
@@ -9,7 +9,7 @@ export interface ContributionManagerOptions {
   enableDevelopmentMode?: boolean
 }
 
-export class ContributionManager extends SafeEventEmitter {
+export class ContributionManager extends EventEmitter {
   private readonly contributionRegistry: ContributionRegistry
   private readonly contributionLoader: ContributionLoader
   private readonly extensionHost: ExtensionHost

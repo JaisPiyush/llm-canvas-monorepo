@@ -6,9 +6,16 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   main: {
     plugins: [externalizeDepsPlugin()],
+    build: {
+      rollupOptions: {
+        input: {
+          index: resolve(__dirname, 'src/main/index.ts'),
+          extensionHostProcess: resolve(__dirname, 'src/main/extensions/extensionHostProcess.ts')
+        }
+      }
+    },
     resolve: {
       alias: {
-        '@shared': resolve('src/shared'),
         '@main': resolve('src/main'),
         '@preload': resolve('src/preload')
       }
@@ -18,7 +25,6 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin()],
     resolve: {
       alias: {
-        '@shared': resolve('src/shared'),
         '@main': resolve('src/main'),
         '@preload': resolve('src/preload')
       }
@@ -27,7 +33,6 @@ export default defineConfig({
   renderer: {
     resolve: {
       alias: {
-        '@renderer': resolve('src/renderer'),
         '@shared': resolve('src/shared'),
         '@preload': resolve('src/preload')
       }
