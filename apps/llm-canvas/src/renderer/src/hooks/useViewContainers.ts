@@ -26,6 +26,8 @@ export function useViewContainers(
       setResolvedViewContainerContribution(containers)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load view containers')
+      // Clear the signal data when an error occurs
+      setResolvedViewContainerContribution([])
     } finally {
       setLoading(false)
     }
